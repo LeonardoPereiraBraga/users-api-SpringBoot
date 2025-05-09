@@ -52,7 +52,7 @@ jobs:
             ls -lh /home/ec2-user/deploy
 
 
-      - name: SSH na EC2 e reiniciar aplicação
+      - name: Iniciar aplicação com nohup
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -60,13 +60,21 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             echo "Matando aplicação antiga (se houver)"
-            pkill -f 'java -jar' || echo "Sem processo para matar"
+            pkill -f 'java -jar' || echo "Sem processo rodando"
+      
+            echo "Iniciando nova aplicação com nohup"
+            nohup java -jar /home/ec2-user/deploy/api-0.0.1-SNAPSHOT.jar > /home/ec2-user/deploy/app.log 2>&1 &
             
-            echo "Executando diretamente o JAR para debug"
-            java -jar /home/ec2-user/deploy/api-0.0.1-SNAPSHOT.jar
-            
-            sleep 5
-            echo "Log de saída:"
-            cat /home/ec2-user/deploy/app.log
+      - name: Verificar log da aplicação
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+            host: ${{ secrets.EC2_HOST }}
+            username: ${{ secrets.EC2_USER }}
+            key: ${{ secrets.EC2_SSH_KEY }}
+            script: |
+              echo "Últimas linhas do app.log:"
+              tail -n 30 /home/ec2-user/deploy/app.log
+
+
 
           
