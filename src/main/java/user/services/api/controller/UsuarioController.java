@@ -29,5 +29,9 @@ public class UsuarioController {
     public String teste(){
         return "Funcionou o teste";
     }
+    @GetMapping("teste2")
+    public String teste(){
+        return "Funcionou o teste";
+    }
 
 }
