@@ -52,7 +52,7 @@ jobs:
             ls -lh /home/ec2-user/deploy
 
 
-      - name: Iniciar aplicação com nohup
+      - name: SSH na EC2 e reiniciar aplicação
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -62,13 +62,15 @@ jobs:
             echo "Verificando processo antigo do Spring Boot"
             PID=$(pgrep -f 'java -jar /home/ec2-user/deploy/api-0.0.1-SNAPSHOT.jar')
             if [ -n "$PID" ]; then
-            echo "Matando processo antigo: $PID"
-            kill $PID
+              echo "Matando processo antigo: $PID"
+              kill $PID
             else
-            echo "Sem processo rodando"
+              echo "Sem processo rodando"
             fi
-            echo "Iniciando nova aplicação com nohup"
+      
+            echo "Iniciando nova aplicação"
             nohup java -jar /home/ec2-user/deploy/api-0.0.1-SNAPSHOT.jar > /home/ec2-user/deploy/app.log 2>&1 &
+
             
       - name: Verificar log da aplicação
         uses: appleboy/ssh-action@v1.0.0
