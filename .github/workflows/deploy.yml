@@ -40,6 +40,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           source: target/api-0.0.1-SNAPSHOT.jar
           target: /home/ec2-user/deploy/
+          strip_components: 1
 
       - name: SSH na EC2 e reiniciar aplicação
         uses: appleboy/ssh-action@v1.0.0
