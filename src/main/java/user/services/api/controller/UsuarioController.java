@@ -30,7 +30,7 @@ public class UsuarioController {
         return "Funcionou o teste";
     }
     @GetMapping("teste2")
-    public String teste(){
+    public String teste2(){
         return "Funcionou o teste";
     }
 
