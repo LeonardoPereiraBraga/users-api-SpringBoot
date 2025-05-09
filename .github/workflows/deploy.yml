@@ -52,24 +52,19 @@ jobs:
             ls -lh /home/ec2-user/deploy
 
 
-      - name: SSH na EC2 e reiniciar aplicação
+      - name: SSH na EC2 e reiniciar aplicação com systemd
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            echo "Verificando processo antigo do Spring Boot"
-            PID=$(pgrep -f 'java -jar /home/ec2-user/deploy/api-0.0.1-SNAPSHOT.jar')
-            if [ -n "$PID" ]; then
-              echo "Matando processo antigo: $PID"
-              kill $PID
-            else
-              echo "Sem processo rodando"
-            fi
-      
-            echo "Iniciando nova aplicação"
-            nohup java -jar /home/ec2-user/deploy/api-0.0.1-SNAPSHOT.jar > /home/ec2-user/deploy/app.log 2>&1 &
+            echo "Reiniciando a aplicação com systemd"
+            sudo systemctl restart springboot-api
+            echo "Esperando o app iniciar..."
+            sleep 5
+            echo "Últimas linhas do log:"
+            sudo journalctl -u springboot-api -n 20
 
             
       - name: Verificar log da aplicação
